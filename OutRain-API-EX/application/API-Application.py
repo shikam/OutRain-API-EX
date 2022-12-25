@@ -54,14 +54,9 @@ def WeatherByCity(req_city):
 
 def getDriveStatus(status_filter):
     with open("input.json", "r") as myfile:
-        lines = myfile.readlines()
-        statusCount = (' '.join(lines)).count(status_filter)
-        result = ""
-        for eachDrive in lines:
-            if eachDrive.find(status_filter) > 0:
-                print(eachDrive)
-                result += eachDrive
-        return "found " + str(statusCount) + " " + status_filter + " drives\n" + result
+        data = json.load(myfile)
+        json_formatted = json.dumps(data)
+    return json_formatted
 
 
 @app.route('/v1/api/checkCurrentWeather', methods=['GET'])
@@ -77,18 +72,17 @@ def request_weather_by_city():
 
 @app.route('/v1/api/driveStatus', methods=['POST'])
 def update_drive_status():
-    receivedJson = request.get_json()
-    status = 'success'
     try:
-        with open('input.json', 'w') as outfile:
-            outfile.write(receivedJson)
+        with open('input.json', 'r') as outfile:
+            data = json.load(outfile)
+            status = 'success'
     except Exception as e:
         logging.error("an error occurred writing the file", e)
         status = 'failure'
-    statusMessage = {
+    status_message = {
         "message": status
     }
-    return json.dumps(statusMessage)
+    return json.dumps(status_message)
 
 
 @app.route('/v1/api/driveStatus', methods=['GET'])
