@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.7-alpine
 WORKDIR /code
 COPY ./requirements.txt /code/requirements.txt
 COPY ./input.json /code/input.json

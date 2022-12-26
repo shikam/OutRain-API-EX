@@ -54,9 +54,44 @@ def WeatherByCity(req_city):
 
 def getDriveStatus(status_filter):
     with open("input.json", "r") as myfile:
-        data = json.load(myfile)
-        json_formatted = json.dumps(data)
-    return json_formatted
+        data = myfile.read()
+    json_data = json.loads(data)
+    output_data = []
+    count = 0
+    for key, value in json_data.items():
+        if value.find(status_filter) > 0:
+            parts = value.split(", ")
+            count = count + 1
+            name = parts[0].split(" ")[1]
+            size = parts[2].split(" ")[1] + parts[2].split(" ")[2]
+            free = parts[3].split(" ")[1] + parts[2].split(" ")[2]
+            path = parts[4].split(" ")[1]
+            log = parts[5].split(" ")[1] + parts[2].split(" ")[2]
+            port = parts[6].split(" ")[1]
+            guid = parts[7].split(" ")[1]
+            clusterUuid = parts[8].split(" ")[1]
+            disks = "[" + parts[9].split(" ")[1] + "," + parts[9].split(" ")[2] + "," + parts[9].split(" ")[3] + "]"
+            dare = parts[10].split(" ")[1]
+
+            # Create a dictionary for the data
+            output_dict = {
+                "name": name,
+                "size": size,
+                "free": free,
+                "path": path,
+                "log": log,
+                "port": port,
+                "guid": guid,
+                "clusterUuid": clusterUuid,
+                "disks": disks,
+                "dare": dare,
+            }
+            output_data.append(output_dict)
+    output = {"data": output_data}
+
+    output_json = json.dumps(output)
+    outputmessage = "message: Found " + str(count) + " " + status_filter + " drives, " + "/n" + output_json
+    return outputmessage
 
 
 @app.route('/v1/api/checkCurrentWeather', methods=['GET'])
@@ -87,8 +122,8 @@ def update_drive_status():
 
 @app.route('/v1/api/driveStatus', methods=['GET'])
 def request_status():
-    statusFilter = str(request.args.get('status'))
-    return getDriveStatus(statusFilter)
+    statusfilter = str(request.args.get('status'))
+    return getDriveStatus(statusfilter)
 
 
 @app.route('/', methods=['GET'])
